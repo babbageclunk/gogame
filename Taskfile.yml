@@ -1,0 +1,29 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+
+
+tasks:
+
+  build:
+    desc: Compile (non-wasm)
+    cmds:
+      - go build
+
+  build-static:
+    desc: Build a static wasm version for hosting without wasmserve
+    cmds:
+      - GOOS=js GOARCH=wasm go build -o static/gogame.wasm
+
+  default:
+    desc: Run wasmserve on the current version
+    cmds:
+      - wasmserve .
+
+  update:
+    desc: Notify the browser to refresh
+    deps: [build]
+    cmds:
+      - curl http://localhost:8080/_notify
