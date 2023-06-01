@@ -96,8 +96,18 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) guyClicked() bool {
-	return g.bbox().Contains(PosPoint(ebiten.CursorPosition())) &&
-		inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
+	touchIDs := make([]ebiten.TouchID, 0, 5)
+	touchIDs = inpututil.AppendJustPressedTouchIDs(touchIDs)
+	var point Point
+	click := true
+	if len(touchIDs) != 0 {
+		point = PosPoint(ebiten.TouchPosition(touchIDs[0]))
+	} else if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		point = PosPoint(ebiten.CursorPosition())
+	} else {
+		click = false
+	}
+	return click && g.bbox().Contains(point)
 }
 
 func (g *Game) bbox() BBox {
